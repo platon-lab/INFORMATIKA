@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Фінальний проєкт з курсу ШІ та нейромережі — Абрамовіч Платон та Бєліков Рома">
+  <meta name="author" content="Абрамовіч Платон, Бєліков Рома">
+  <meta name="keywords" content="штучний інтелект, нейромережі, ChatGPT, DeepSeek, Gemini, Grok, Leonardo.ai, школа, проєкт">
+  <meta name="robots" content="noindex, nofollow">
+  <meta property="og:title" content="ШІ та Нейромережі — Фінальний Проєкт">
+  <meta property="og:description" content="Що ми засвоїли під час вивчення курсу ШІ та нейромережі">
+  <meta property="og:type" content="website">
+  <title>ШІ та Нейромережі — Фінальний Проєкт</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --neon-blue: #00f0ff;
+      --neon-purple: #b400ff;
+      --neon-green: #00ff88;
+      --neon-pink: #ff0099;
+      --dark: #04040f;
+      --dark2: #080820;
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(0,240,255,0.2);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background: var(--dark);
+      color: #fff;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* ── STARS BG ── */
+    #stars {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: radial-gradient(ellipse at 20% 50%, rgba(180,0,255,0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 20%, rgba(0,240,255,0.08) 0%, transparent 50%),
+                  var(--dark);
+    }
+    #stars::before, #stars::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(1px 1px at 50px 80px, #fff, transparent),
+        radial-gradient(1px 1px at 200px 300px, #fff, transparent),
+        radial-gradient(1px 1px at 400px 150px, #fff, transparent),
+        radial-gradient(1px 1px at 600px 400px, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 100px 500px, #b400ff, transparent),
+        radial-gradient(1.5px 1.5px at 700px 100px, #00f0ff, transparent),
+        radial-gradient(1px 1px at 300px 600px, #fff, transparent),
+        radial-gradient(1px 1px at 900px 350px, #fff, transparent),
+        radial-gradient(1px 1px at 1100px 250px, #00ff88, transparent),
+        radial-gradient(1px 1px at 1300px 500px, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 1500px 150px, #ff0099, transparent),
+        radial-gradient(1px 1px at 50px 700px, #fff, transparent),
+        radial-gradient(1px 1px at 800px 600px, #fff, transparent),
+        radial-gradient(1px 1px at 1200px 700px, #fff, transparent),
+        radial-gradient(1px 1px at 450px 350px, #b400ff, transparent),
+        radial-gradient(1px 1px at 1000px 450px, #00f0ff, transparent);
+      opacity: 0.6;
+    }
+
+    /* ── SLIDES ── */
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 40px;
+      opacity: 0;
+      transform: translateX(100px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: all;
+    }
+    .slide.exit {
+      opacity: 0;
+      transform: translateX(-100px);
+    }
+
+    /* ── NAV ── */
+    #nav {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 12px; z-index: 100;
+      background: rgba(0,0,0,0.6);
+      padding: 12px 20px;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+    #nav button {
+      background: none; border: 1.5px solid var(--neon-blue);
+      color: var(--neon-blue); padding: 8px 20px; border-radius: 30px;
+      font-family: 'Orbitron', sans-serif; font-size: 12px;
+      cursor: pointer; transition: all 0.3s;
+      letter-spacing: 1px;
+    }
+    #nav button:hover { background: var(--neon-blue); color: #000; }
+    #nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+    #slide-counter {
+      color: rgba(255,255,255,0.4);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      display: flex; align-items: center;
+      min-width: 60px; justify-content: center;
+    }
+
+    /* ── PROGRESS BAR ── */
+    #progress {
+      position: fixed; top: 0; left: 0;
+      height: 3px; background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+      transition: width 0.5s ease; z-index: 200;
+      box-shadow: 0 0 10px var(--neon-blue);
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      position: fixed; top: 20px; right: 30px;
+      font-family: 'Orbitron', sans-serif; font-size: 10px;
+      color: rgba(0,240,255,0.5); letter-spacing: 2px;
+      z-index: 100;
+    }
+
+    /* ─────────────────────────────────────────
+       SLIDE STYLES
+    ───────────────────────────────────────── */
+
+    /* TITLE SLIDE */
+    .slide-title h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 5vw, 4.5rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-align: center; line-height: 1.1;
+      animation: glow-text 3s ease-in-out infinite alternate;
+      margin-bottom: 20px;
+    }
+    @keyframes glow-text {
+      from { filter: drop-shadow(0 0 20px rgba(0,240,255,0.5)); }
+      to   { filter: drop-shadow(0 0 40px rgba(180,0,255,0.8)); }
+    }
+    .slide-title .subtitle {
+      font-size: 1.1rem; color: rgba(255,255,255,0.6);
+      text-align: center; letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+    }
+    .authors-box {
+      display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;
+    }
+    .author-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 35px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      position: relative; overflow: hidden;
+    }
+    .author-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(0,240,255,0.05), rgba(180,0,255,0.05));
+    }
+    .author-card .name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--neon-blue);
+    }
+    .author-card .role { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 4px; }
+
+    /* GENERIC HEADING */
+    .slide-heading {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.4rem, 3vw, 2.5rem);
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .neon-line {
+      width: 80px; height: 2px; margin: 0 auto 30px;
+      background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+      border-radius: 2px;
+      box-shadow: 0 0 10px var(--neon-blue);
+    }
+
+    /* INFO CARDS GRID */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px; width: 100%; max-width: 1100px;
+    }
+    .info-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.3s, transform 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .info-card:hover { border-color: var(--neon-blue); transform: translateY(-4px); }
+    .info-card .ic-icon { font-size: 2rem; margin-bottom: 10px; }
+    .info-card h3 { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--neon-blue); margin-bottom: 6px; }
+    .info-card p { font-size: 0.8rem; color: rgba(255,255,255,0.65); line-height: 1.5; }
+
+    /* AI SLIDE */
+    .ai-slide-content {
+      display: flex; gap: 40px; align-items: center;
+      max-width: 1000px; width: 100%;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .ai-logo-box {
+      width: 180px; height: 180px; flex-shrink: 0;
+      border-radius: 30px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem;
+      border: 2px solid var(--border);
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+    .ai-logo-box .ai-name-lbl {
+      position: absolute; bottom: -30px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem; color: var(--neon-blue);
+      letter-spacing: 1px; white-space: nowrap;
+    }
+    .ai-info { flex: 1; min-width: 250px; }
+    .ai-info h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 900; margin-bottom: 6px;
+    }
+    .ai-info .ai-tagline {
+      font-size: 0.85rem; color: rgba(255,255,255,0.4);
+      letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .ai-info .ai-desc {
+      font-size: 0.92rem; color: rgba(255,255,255,0.75);
+      line-height: 1.7; margin-bottom: 20px;
+    }
+    .fact-box {
+      background: rgba(0,240,255,0.06);
+      border: 1px solid rgba(0,240,255,0.25);
+      border-radius: 12px; padding: 14px 18px;
+      margin-bottom: 20px;
+    }
+    .fact-box .fact-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.7rem; color: var(--neon-green);
+      letter-spacing: 2px; margin-bottom: 6px;
+    }
+    .fact-box p { font-size: 0.85rem; color: rgba(255,255,255,0.8); line-height: 1.5; }
+
+    /* VIDEO BUTTON */
+    .btn-video {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 12px 28px;
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+      border: none; border-radius: 50px;
+      color: #000; font-family: 'Orbitron', sans-serif;
+      font-size: 0.8rem; font-weight: 700;
+      cursor: pointer; transition: all 0.3s;
+      box-shadow: 0 0 20px rgba(0,240,255,0.3);
+      letter-spacing: 1px;
+    }
+    .btn-video:hover { transform: scale(1.05); box-shadow: 0 0 40px rgba(0,240,255,0.6); }
+
+    /* VIDEO OVERLAY */
+    #video-overlay {
+      position: fixed; inset: 0;
+      background: #000;
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    #video-overlay.show { display: flex; }
+    #video-overlay video {
+      width: 100%; height: 100%;
+      object-fit: contain;
+    }
+    #video-title {
+      position: absolute; top: 20px; left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem; color: var(--neon-blue);
+      letter-spacing: 2px;
+      text-shadow: 0 0 20px var(--neon-blue);
+      z-index: 1001;
+    }
+    #skip-hint {
+      position: absolute; bottom: 80px; right: 30px;
+      font-size: 0.75rem; color: rgba(255,255,255,0.35);
+      font-family: 'Orbitron', sans-serif; letter-spacing: 1px;
+      z-index: 1001;
+    }
+    #skip-progress {
+      position: absolute; bottom: 60px; right: 30px;
+      display: flex; gap: 5px;
+      z-index: 1001;
+    }
+    .skip-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.4);
+      transition: background 0.2s;
+    }
+    .skip-dot.filled { background: var(--neon-blue); border-color: var(--neon-blue); }
+
+    /* PROFESSION SLIDES */
+    .prof-content { max-width: 900px; width: 100%; }
+    .timeline { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
+    .tl-item {
+      display: flex; gap: 20px; align-items: flex-start;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 18px 22px;
+      transition: border-color 0.3s;
+    }
+    .tl-item:hover { border-color: var(--neon-purple); }
+    .tl-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem; font-weight: 900;
+      color: var(--neon-purple); min-width: 40px;
+    }
+    .tl-text h3 { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: #fff; margin-bottom: 5px; }
+    .tl-text p { font-size: 0.82rem; color: rgba(255,255,255,0.65); line-height: 1.5; }
+
+    /* CONCLUSION */
+    .conclusion-content { max-width: 850px; text-align: center; }
+    .conclusion-content p { font-size: 1rem; color: rgba(255,255,255,0.75); line-height: 1.8; margin-bottom: 16px; }
+    .big-quote {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1rem, 2.5vw, 1.6rem);
+      color: var(--neon-blue);
+      margin: 20px 0;
+      line-height: 1.4;
+    }
+
+    /* BIG AD SLIDE ENHANCEMENTS */
+    .ad-slide {
+      background: radial-gradient(circle at center, #00220c 0%, #000 100%);
+      box-shadow: inset 0 0 150px rgba(0, 255, 136, 0.2);
+      animation: ad-pulse 4s infinite alternate;
+      display: flex; align-items: center; justify-content: center;
+      width: 100vw; height: 100vh;
+    }
+    @keyframes ad-pulse {
+      0% { box-shadow: inset 0 0 50px rgba(0, 255, 136, 0.1); }
+      100% { box-shadow: inset 0 0 250px rgba(0, 255, 136, 0.6); }
+    }
+    .ad-slide::before {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(45deg, rgba(0,255,136,0.03) 0px, rgba(0,255,136,0.03) 2px, transparent 2px, transparent 10px);
+      pointer-events: none;
+    }
+    .ad-content { 
+      text-align: center; position: relative; z-index: 2; 
+      transform: scale(1.3);
+      width: 100%;
+    }
+    @media (max-width: 900px) { .ad-content { transform: scale(1); } }
+    
+    .ad-content .ad-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.8rem; letter-spacing: 5px;
+      color: rgba(0,255,136,0.7); margin-bottom: 15px;
+      text-shadow: 0 0 10px rgba(0,255,136,0.5);
+    }
+    .ad-content h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, #00ff88, #00f0ff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 0 15px rgba(0,255,136,0.4));
+    }
+    .ad-content .ad-sub {
+      font-size: 1.1rem; color: #fff;
+      margin-bottom: 40px; letter-spacing: 2px;
+      text-shadow: 0 0 5px rgba(0,0,0,0.8);
+    }
+    .btn-site {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 18px 45px;
+      background: linear-gradient(135deg, #00ff88, #00f0ff);
+      border: none; border-radius: 50px;
+      color: #000; font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem; font-weight: 900;
+      cursor: pointer; transition: all 0.3s;
+      box-shadow: 0 0 40px rgba(0,255,136,0.5);
+      text-decoration: none; letter-spacing: 2px;
+      margin-bottom: 40px;
+    }
+    .btn-site:hover { transform: scale(1.1); box-shadow: 0 0 80px rgba(0,255,136,0.9); }
+    .heroes-row {
+      display: flex; gap: 20px; justify-content: center;
+      flex-wrap: wrap; margin-top: 10px;
+    }
+    .hero-img {
+      width: 90px; height: 90px; object-fit: contain;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(0,255,136,0.3);
+      padding: 8px;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .hero-img:hover { transform: scale(1.25) rotate(8deg); border-color: #00ff88; box-shadow: 0 0 20px rgba(0,255,136,0.6); z-index: 10; position: relative;}
+
+    /* CREDITS ANIMATION */
+    .credits-wrapper {
+      position: relative; width: 100%; max-width: 800px; height: 55vh; margin: 20px auto 0;
+      overflow: hidden;
+      mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+      -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+    }
+    .credits-scroll {
+      position: absolute; top: 100%; left: 0; width: 100%;
+      animation: credits-run 25s linear infinite;
+      text-align: center;
+      padding-bottom: 50px;
+    }
+    .credits-scroll:hover {
+      animation-play-state: paused;
+    }
+    @keyframes credits-run {
+      0% { top: 100%; }
+      100% { top: -200%; }
+    }
+    .cr-role { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: var(--neon-blue); letter-spacing: 4px; margin-top: 40px; text-transform: uppercase; }
+    .cr-name { font-size: 1.6rem; font-weight: 700; color: #fff; margin-top: 8px; text-shadow: 0 0 15px rgba(255,255,255,0.3); }
+
+    /* THANKS SLIDE HEADER */
+    .thanks-h {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-align: center;
+      animation: glow-text 2s ease-in-out infinite alternate;
+    }
+
+    /* SECTION INTRO SLIDE */
+    .section-intro {
+      text-align: center;
+    }
+    .section-intro .big-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 8rem; font-weight: 900;
+      opacity: 0.06; position: absolute;
+      top: 50%; transform: translateY(-50%);
+      pointer-events: none;
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .section-intro h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 3.5rem);
+      font-weight: 900;
+    }
+    .section-intro p { font-size: 1rem; color: rgba(255,255,255,0.6); margin-top: 16px; max-width: 650px; line-height: 1.7; }
+
+    /* TAG BADGES */
+    .tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .tag {
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 0.72rem; letter-spacing: 1px;
+      font-weight: 600;
+    }
+    .tag-blue { background: rgba(0,240,255,0.15); border: 1px solid rgba(0,240,255,0.3); color: var(--neon-blue); }
+    .tag-purple { background: rgba(180,0,255,0.15); border: 1px solid rgba(180,0,255,0.3); color: var(--neon-purple); }
+    .tag-green { background: rgba(0,255,136,0.15); border: 1px solid rgba(0,255,136,0.3); color: var(--neon-green); }
+
+    /* STAT BOXES */
+    .stats-row { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+    .stat-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px 30px; text-align: center;
+      min-width: 130px;
+    }
+    .stat-box .stat-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem; font-weight: 900;
+      color: var(--neon-blue);
+    }
+    .stat-box .stat-lbl { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+    /* AI COLOR THEMES */
+    .theme-chatgpt .ai-info h2 { color: #10a37f; }
+    .theme-chatgpt .ai-logo-box { border-color: rgba(16,163,127,0.4); }
+    .theme-deepseek .ai-info h2 { color: #4B8CFF; }
+    .theme-deepseek .ai-logo-box { border-color: rgba(75,140,255,0.4); }
+    .theme-gemini .ai-info h2 { background: linear-gradient(135deg,#4285f4,#9b72cb,#ea4335); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .theme-grok .ai-info h2 { color: #fff; }
+    .theme-grok .ai-logo-box { border-color: rgba(255,255,255,0.3); }
+    .theme-leonardo .ai-info h2 { color: #ff9500; }
+    .theme-leonardo .ai-logo-box { border-color: rgba(255,149,0,0.4); }
+    .theme-vizard .ai-info h2 { color: #ff3cac; }
+    .theme-vizard .ai-logo-box { border-color: rgba(255,60,172,0.4); }
+    .theme-dalle .ai-info h2 { color: #ffcc00; }
+    .theme-dalle .ai-logo-box { border-color: rgba(255,204,0,0.4); }
+
+    /* Floating particles */
+    .particle {
+      position: fixed;
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--neon-blue);
+      pointer-events: none; z-index: 0;
+      animation: float-up 8s linear infinite;
+      opacity: 0;
+    }
+    @keyframes float-up {
+      0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+      10% { opacity: 0.7; }
+      90% { opacity: 0.3; }
+      100% { transform: translateY(-100px) translateX(30px); opacity: 0; }
+    }
+
+    /* KEYBOARD HINT */
+    #key-hint {
+      position: fixed; top: 20px; left: 30px;
+      font-size: 0.7rem; color: rgba(255,255,255,0.25);
+      font-family: 'Orbitron', sans-serif; letter-spacing: 1px;
+      z-index: 100;
+    }
+
+    @media (max-width: 600px) {
+      .ai-logo-box { width: 100px; height: 100px; font-size: 3rem; }
+      #nav button { padding: 6px 14px; font-size: 10px; }
+      .slide { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="stars"></div>
+<div id="progress"></div>
+<div class="section-label" id="section-label">ВСТУП</div>
+<div id="key-hint">← → або ПРОБІЛ</div>
+
+<script>
+  for(let i=0;i<15;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.left=Math.random()*100+'vw';
+    p.style.animationDelay=Math.random()*8+'s';
+    p.style.animationDuration=(6+Math.random()*6)+'s';
+    p.style.background=['#00f0ff','#b400ff','#00ff88','#ff0099'][Math.floor(Math.random()*4)];
+    p.style.width=p.style.height=(1+Math.random()*3)+'px';
+    document.body.appendChild(p);
+  }
+</script>
+
+<div class="slide slide-title active" data-section="ВСТУП">
+  <h1>ШІ та Нейромережі<br>Фінальний Проєкт</h1>
+  <p class="subtitle">Курс "Штучний Інтелект" · 2026</p>
+  <div class="authors-box">
+    <div class="author-card">
+      <div class="name">Абрамовіч Платон</div>
+      <div class="role">Учень · Майбутній програміст</div>
+    </div>
+    <div class="author-card">
+      <div class="name">Бєліков Рома</div>
+      <div class="role">Учень · Майбутній програміст</div>
+    </div>
+  </div>
+  <div style="margin-top:30px; font-size:0.8rem; color:rgba(255,255,255,0.3); letter-spacing:2px; font-family:'Orbitron',sans-serif;">
+    НАТИСНИ → АБО ПРОБІЛ ЩОБ ПОЧАТИ
+  </div>
+</div>
+
+<div class="slide" data-section="ПЛАН">
+  <h2 class="slide-heading">📋 Структура Проєкту</h2>
+  <div class="neon-line"></div>
+  <div class="cards-grid" style="max-width:900px">
+    <div class="info-card">
+      <div class="ic-icon">1️⃣</div>
+      <h3>Що таке ШІ?</h3>
+      <p>Базові поняття, визначення та короткий екскурс у світ штучного інтелекту</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">2️⃣</div>
+      <h3>ШІ-інструменти</h3>
+      <p>Огляд найпотужніших нейромереж, з якими ми працювали під час курсу</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">3️⃣</div>
+      <h3>Майбутня професія</h3>
+      <p>Як ШІ допоможе нам стати крутими програмістами</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">4️⃣</div>
+      <h3>Висновок</h3>
+      <p>Підсумки курсу та плани на майбутнє</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" data-section="ШІ — ОСНОВИ">
+  <h2 class="slide-heading">🤖 Що таке Штучний Інтелект?</h2>
+  <div class="neon-line"></div>
+  <div style="max-width:800px; text-align:center;">
+    <p style="font-size:1.05rem; color:rgba(255,255,255,0.8); line-height:1.8; margin-bottom:24px;">
+      <strong style="color:var(--neon-blue)">Штучний інтелект (ШІ)</strong> — це технологія, що дозволяє комп'ютерам виконувати завдання, які раніше вимагали людського розуму: розуміти мову, розпізнавати зображення, приймати рішення та вчитися на досвіді.
+    </p>
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num">2024</div><div class="stat-lbl">Рік буму ШІ</div></div>
+      <div class="stat-box"><div class="stat-num">1B+</div><div class="stat-lbl">Користувачів ChatGPT</div></div>
+      <div class="stat-box"><div class="stat-num">Безліч</div><div class="stat-lbl">ШІ що ми вивчили</div></div>
+      <div class="stat-box"><div class="stat-num">∞</div><div class="stat-lbl">Можливостей</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="slide" data-section="ШІ — ОСНОВИ">
+  <h2 class="slide-heading">🧠 Типи ШІ</h2>
+  <div class="neon-line"></div>
+  <div class="cards-grid">
+    <div class="info-card">
+      <div class="ic-icon">💬</div>
+      <h3>Мовні моделі (LLM)</h3>
+      <p>Генерують та розуміють текст. ChatGPT, DeepSeek, Gemini, Grok — все це LLM.</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">🎨</div>
+      <h3>Генерація зображень</h3>
+      <p>Leonardo.ai, DALL·E — створюють картинки з текстового опису за секунди.</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">🎬</div>
+      <h3>Відеоредагування</h3>
+      <p>Vizard.ai — нарізає довгі відео на кліпи для TikTok та Reels автоматично.</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">🔧</div>
+      <h3>ШІ-Агенти</h3>
+      <p>Самостійно виконують задачі: шукають інформацію, пишуть код, керують файлами.</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" data-section="ШІ — ОСНОВИ">
+  <h2 class="slide-heading">🕸️ Нейромережі</h2>
+  <div class="neon-line"></div>
+  <div style="max-width:850px; width:100%;">
+    <p style="font-size:0.95rem; color:rgba(255,255,255,0.75); line-height:1.8; text-align:center; margin-bottom:24px;">
+      Нейромережа — це математична модель, натхненна роботою мозку. Вона складається з шарів «нейронів», які обробляють дані та вчаться знаходити закономірності.
+    </p>
+    <div class="cards-grid">
+      <div class="info-card">
+        <div class="ic-icon">📥</div>
+        <h3>Вхідний шар</h3>
+        <p>Приймає дані: текст, картинку, звук, числа</p>
+      </div>
+      <div class="info-card">
+        <div class="ic-icon">⚙️</div>
+        <h3>Приховані шари</h3>
+        <p>Обробляють та трансформують інформацію через мільярди ваг</p>
+      </div>
+      <div class="info-card">
+        <div class="ic-icon">📤</div>
+        <h3>Вихідний шар</h3>
+        <p>Дає відповідь: слово, клас об'єкту, рішення</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide" data-section="ШІ — ОСНОВИ">
+  <h2 class="slide-heading">⚡ Як навчають ШІ?</h2>
+  <div class="neon-line"></div>
+  <div class="prof-content">
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-num">01</div>
+        <div class="tl-text">
+          <h3>Збір даних</h3>
+          <p>Мільярди текстів з інтернету, книг, статей — все це стає «їжею» для ШІ</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">02</div>
+        <div class="tl-text">
+          <h3>Pre-training (Попереднє навчання)</h3>
+          <p>ШІ вчиться передбачати наступне слово у реченні, обробляючи терабайти тексту</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">03</div>
+        <div class="tl-text">
+          <h3>RLHF — навчання з людського відгуку</h3>
+          <p>Люди оцінюють відповіді, а ШІ навчається давати кращі — ставати корисним та безпечним</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">04</div>
+        <div class="tl-text">
+          <h3>Деплой і фідбек</h3>
+          <p>Мільйони користувачів взаємодіють з моделлю — вона стає дедалі розумнішою</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide section-intro" data-section="ШІ-ІНСТРУМЕНТИ">
+  <div class="big-num">AI</div>
+  <h2 class="slide-heading" style="background:linear-gradient(135deg,var(--neon-blue),var(--neon-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Наші Топ-7 ШІ</h2>
+  <div class="neon-line"></div>
+  <p style="font-size:1rem; color:rgba(255,255,255,0.6); max-width:650px; line-height:1.7; text-align:center;">
+    За час курсу ми протестували та вивчили набагато більше нейромереж! Але для цієї презентації ми відібрали 7 найцікавіших та найпотужніших інструментів. Кожен з них — унікальний.
+  </p>
+  <div class="tag-row" style="justify-content:center; margin-top:16px;">
+    <span class="tag tag-blue">ChatGPT</span>
+    <span class="tag tag-purple">DeepSeek</span>
+    <span class="tag tag-green">Gemini</span>
+    <span class="tag tag-blue">Grok</span>
+    <span class="tag tag-purple">Leonardo.ai</span>
+    <span class="tag tag-green">Vizard.ai</span>
+    <span class="tag tag-blue">DALL·E</span>
+  </div>
+</div>
+
+<div class="slide theme-chatgpt" data-section="ШІ-ІНСТРУМЕНТИ" data-video="ChatGPT.mp4" data-ai="ChatGPT">
+  <div class="ai-slide-content">
+    <div style="text-align:center;">
+      <div class="ai-logo-box">
+        <span>🤖</span>
+        <span class="ai-name-lbl">ChatGPT</span>
+      </div>
+    </div>
+    <div class="ai-info">
+      <h2>ChatGPT</h2>
+      <div class="ai-tagline">OpenAI · 2022 · Мовна модель</div>
+      <div class="ai-desc">
+        ChatGPT — найпопулярніший у світі чат-бот на базі GPT-4. Відповідає на запитання, пише код, перекладає, складає тексти та допомагає з будь-якими завданнями. Ми використовували його для написання коду та пояснення складних тем.
+      </div>
+      <div class="fact-box">
+        <div class="fact-label">🌟 ЦІКАВИЙ ФАКТ</div>
+        <p>ChatGPT набрав 1 мільйон користувачів усього за 5 днів після запуску — це рекорд у Tech-індустрії!</p>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-blue">Текст</span>
+        <span class="tag tag-green">Код</span>
+        <span class="tag tag-purple">Аналіз</span>
+      </div>
+      <br>
+      <button class="btn-video" onclick="playVideo('ChatGPT.mp4','ChatGPT')">▶ Дізнатися більше</button>
+    </div>
+  </div>
+</div>
+
+<div class="slide theme-deepseek" data-section="ШІ-ІНСТРУМЕНТИ" data-video="DeepSeek.mp4" data-ai="DeepSeek">
+  <div class="ai-slide-content">
+    <div style="text-align:center;">
+      <div class="ai-logo-box">
+        <span>🔍</span>
+        <span class="ai-name-lbl">DeepSeek</span>
+      </div>
+    </div>
+    <div class="ai-info">
+      <h2>DeepSeek</h2>
+      <div class="ai-tagline">DeepSeek AI · 2024 · Китайська LLM</div>
+      <div class="ai-desc">
+        DeepSeek — китайська мовна модель, яка шокувала весь Tech-світ. Вона не поступається ChatGPT у якості відповідей, але коштує набагато менше в навчанні. Особливо сильна в математиці та програмуванні.
+      </div>
+      <div class="fact-box">
+        <div class="fact-label">🌟 ЦІКАВИЙ ФАКТ</div>
+        <p>Після виходу DeepSeek акції NVIDIA впали на 600 мільярдів доларів за один день — інвестори злякались конкуренції з Азії!</p>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-blue">Математика</span>
+        <span class="tag tag-green">Код</span>
+        <span class="tag tag-purple">Безкоштовний</span>
+      </div>
+      <br>
+      <button class="btn-video" onclick="playVideo('DeepSeek.mp4','DeepSeek')">▶ Дізнатися більше</button>
+    </div>
+  </div>
+</div>
+
+<div class="slide theme-gemini" data-section="ШІ-ІНСТРУМЕНТИ" data-video="Gemini.mp4" data-ai="Gemini">
+  <div class="ai-slide-content">
+    <div style="text-align:center;">
+      <div class="ai-logo-box">
+        <span>✨</span>
+        <span class="ai-name-lbl">Gemini</span>
+      </div>
+    </div>
+    <div class="ai-info">
+      <h2>Gemini</h2>
+      <div class="ai-tagline">Google DeepMind · 2023 · Multimodal AI</div>
+      <div class="ai-desc">
+        Gemini від Google — мультимодальний ШІ, що одночасно розуміє текст, зображення, аудіо та відео. Вбудований у Google Search, Gmail та Docs. Має найдовший контекстний вікно серед усіх моделей — до 2 мільйонів токенів!
+      </div>
+      <div class="fact-box">
+        <div class="fact-label">🌟 ЦІКАВИЙ ФАКТ</div>
+        <p>Gemini може «прочитати» цілу книгу Гаррі Поттера за один раз — його контекстне вікно вміщає понад 1500 сторінок тексту!</p>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-blue">Google</span>
+        <span class="tag tag-green">Мультимодальний</span>
+        <span class="tag tag-purple">Безкоштовний</span>
+      </div>
+      <br>
+      <button class="btn-video" onclick="playVideo('Gemini.mp4','Gemini')">▶ Дізнатися більше</button>
+    </div>
+  </div>
+</div>
+
+<div class="slide theme-grok" data-section="ШІ-ІНСТРУМЕНТИ" data-video="Grok.mp4" data-ai="Grok">
+  <div class="ai-slide-content">
+    <div style="text-align:center;">
+      <div class="ai-logo-box" style="font-size:4rem;">
+        <span>𝕏</span>
+        <span class="ai-name-lbl">Grok</span>
+      </div>
+    </div>
+    <div class="ai-info">
+      <h2>Grok</h2>
+      <div class="ai-tagline">xAI · Ілон Маск · 2023</div>
+      <div class="ai-desc">
+        Grok — ШІ від компанії xAI Ілона Маска. Інтегрований у X (Twitter) і має доступ до реальних твітів у реальному часі. Відрізняється гумором та «без цензури» стилем відповідей. Може генерувати зображення та аналізувати новини.
+      </div>
+      <div class="fact-box">
+        <div class="fact-label">🌟 ЦІКАВИЙ ФАКТ</div>
+        <p>Grok названо на честь слова з роману «Stranger in a Strange Land» — воно означає «повністю зрозуміти щось на глибинному рівні».</p>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-blue">X/Twitter</span>
+        <span class="tag tag-green">Реальний час</span>
+        <span class="tag tag-purple">Гумор</span>
+      </div>
+      <br>
+      <button class="btn-video" onclick="playVideo('Grok.mp4','Grok')">▶ Дізнатися більше</button>
+    </div>
+  </div>
+</div>
+
+<div class="slide theme-leonardo" data-section="ШІ-ІНСТРУМЕНТИ" data-video="Leonardo.mp4" data-ai="Leonardo.ai">
+  <div class="ai-slide-content">
+    <div style="text-align:center;">
+      <div class="ai-logo-box">
+        <span>🎨</span>
+        <span class="ai-name-lbl">Leonardo.ai</span>
+      </div>
+    </div>
+    <div class="ai-info">
+      <h2>Leonardo.ai</h2>
+      <div class="ai-tagline">Leonardo AI · 2022 · Генерація зображень</div>
+      <div class="ai-desc">
+        Leonardo.ai — потужний інструмент для генерації зображень, заточений під ігрову індустрію та дизайн. Створює персонажів, ігрові ресурси, концепт-арт. Дозволяє тренувати власні стилі. Ми робили з ним персонажів для ігор!
+      </div>
+      <div class="fact-box">
+        <div class="fact-label">🌟 ЦІКАВИЙ ФАКТ</div>
+        <p>За допомогою Leonardo.ai можна створити персонажа для відеогри за 30 секунд — раніше художнику-ілюстратору на це йшов тиждень роботи!</p>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-blue">Арт</span>
+        <span class="tag tag-green">Ігри</span>
+        <span class="tag tag-purple">Дизайн</span>
+      </div>
+      <br>
+      <button class="btn-video" onclick="playVideo('Leonardo.mp4','Leonardo.ai')">▶ Дізнатися більше</button>
+    </div>
+  </div>
+</div>
+
+<div class="slide theme-vizard" data-section="ШІ-ІНСТРУМЕНТИ" data-video="Vizard.mp4" data-ai="Vizard.ai">
+  <div class="ai-slide-content">
+    <div style="text-align:center;">
+      <div class="ai-logo-box">
+        <span>🎬</span>
+        <span class="ai-name-lbl">Vizard.ai</span>
+      </div>
+    </div>
+    <div class="ai-info">
+      <h2>Vizard.ai</h2>
+      <div class="ai-tagline">Vizard · 2021 · Відео-ШІ</div>
+      <div class="ai-desc">
+        Vizard.ai — ШІ для автоматичного нарізання відео на короткі кліпи. Завантажуєш довгий стрім чи відео, а він сам знаходить найцікавіші моменти та створює вертикальні відео для TikTok, YouTube Shorts та Instagram Reels.
+      </div>
+      <div class="fact-box">
+        <div class="fact-label">🌟 ЦІКАВИЙ ФАКТ</div>
+        <p>Vizard.ai може перетворити 3-годинний стрім у 10 готових TikTok-кліпів за лічені хвилини — без жодного ручного монтажу!</p>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-blue">TikTok</span>
+        <span class="tag tag-green">Shorts</span>
+        <span class="tag tag-purple">Монтаж</span>
+      </div>
+      <br>
+      <button class="btn-video" onclick="playVideo('Vizard.mp4','Vizard.ai')">▶ Дізнатися більше</button>
+    </div>
+  </div>
+</div>
+
+<div class="slide theme-dalle" data-section="ШІ-ІНСТРУМЕНТИ" data-video="DALL_E.mp4" data-ai="DALL·E">
+  <div class="ai-slide-content">
+    <div style="text-align:center;">
+      <div class="ai-logo-box">
+        <span>🖼️</span>
+        <span class="ai-name-lbl">DALL·E</span>
+      </div>
+    </div>
+    <div class="ai-info">
+      <h2>DALL·E</h2>
+      <div class="ai-tagline">OpenAI · Вбудований у ChatGPT</div>
+      <div class="ai-desc">
+        DALL·E — це функція генерування зображень, вбудована прямо в ChatGPT! Ти просто пишеш у чаті що хочеш намалювати, і за секунди отримуєш картинку. Більше не потрібно окремо відкривати інші сайти — все в одному місці.
+      </div>
+      <div class="fact-box">
+        <div class="fact-label">🌟 ЦІКАВИЙ ФАКТ</div>
+        <p>Назва DALL·E — це суміш імені художника Сальвадора Далі та робота WALL·E з мультфільму Pixar. OpenAI навмисно придумали таку назву!</p>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-blue">ChatGPT</span>
+        <span class="tag tag-green">Зображення</span>
+        <span class="tag tag-purple">Дифузійна модель</span>
+      </div>
+      <br>
+      <button class="btn-video" onclick="playVideo('DALL_E.mp4','DALL·E')">▶ Дізнатися більше</button>
+    </div>
+  </div>
+</div>
+
+<div class="slide" data-section="ШІ-ІНСТРУМЕНТИ">
+  <h2 class="slide-heading">📊 Порівняння ШІ</h2>
+  <div class="neon-line"></div>
+  <div style="max-width:900px;width:100%;overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--border);">
+          <th style="padding:10px 14px;text-align:left;color:var(--neon-blue);font-family:'Orbitron',sans-serif;font-size:0.75rem;">ШІ</th>
+          <th style="padding:10px 14px;color:var(--neon-blue);font-family:'Orbitron',sans-serif;font-size:0.75rem;">Тип</th>
+          <th style="padding:10px 14px;color:var(--neon-blue);font-family:'Orbitron',sans-serif;font-size:0.75rem;">Найкраще для</th>
+          <th style="padding:10px 14px;color:var(--neon-blue);font-family:'Orbitron',sans-serif;font-size:0.75rem;">Ціна</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+          <td style="padding:10px 14px;font-weight:600;color:#10a37f">🤖 ChatGPT</td>
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.6)">LLM</td>
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.6)">Усе підряд</td>
+          <td style="padding:10px 14px;color:var(--neon-green)">Безкоштовно / $20</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+          <td style="padding:10px 14px;font-weight:600;color:#4B8CFF">🔍 DeepSeek</td>
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.6)">LLM</td>
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.6)">Код, математика</td>
+          <td style="padding:10px 14px;color:var(--neon-green)">Безкоштовно</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+          <td style="padding:10px 14px;font-weight:600;color:#4285f4">✨ Gemini</td>
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.6)">Мультимодальний</td>
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.6)">Google-сервіси</td>
+          <td style="padding:10px 14px;color:var(--neon-green)">Безкоштовно</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+          <td style="padding:10px 14px;font-weight:600;">𝕏 Grok</td>
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.6)">LLM</td>
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.6)">Twitter, новини</td>
+          <td style="padding:10px 14px;color:rgba(255,200,0,0.8)">X Premium</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+          <td style="padding:10px 14px;font-weight:600;color:#ff9500">🎨 Leonardo.ai</td>
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.6)">Image Gen</td>
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.6)">Ігри, арт</td>
+          <td style="padding:10px 14px;color:var(--neon-green)">Freemium</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+          <td style="padding:10px 14px;font-weight:600;color:#ff3cac">🎬 Vizard.ai</td>
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.6)">Відео</td>
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.6)">Кліпи, Shorts</td>
+          <td style="padding:10px 14px;color:var(--neon-green)">Freemium</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 14px;font-weight:600;color:#ffcc00">🖼️ DALL·E</td>
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.6)">Image Gen</td>
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.6)">В ChatGPT</td>
+          <td style="padding:10px 14px;color:rgba(255,200,0,0.8)">ChatGPT Plus</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="slide" data-section="ШІ-ІНСТРУМЕНТИ">
+  <h2 class="slide-heading">🌌 Це ще не все...</h2>
+  <div class="neon-line"></div>
+  <p style="font-size:1rem;color:rgba(255,255,255,0.7);text-align:center;max-width:800px;margin-bottom:20px;">За час курсу ми тестували набагато більше інструментів. Ось деякі з них, які теж варті уваги:</p>
+  <div class="cards-grid">
+    <div class="info-card"><div class="ic-icon">🎵</div><h3>Suno AI</h3><p>Генерація крутих пісень та музики за текстовим описом</p></div>
+    <div class="info-card"><div class="ic-icon">🧠</div><h3>Claude</h3><p>Дуже розумний ШІ від Anthropic, відмінно пише тексти</p></div>
+    <div class="info-card"><div class="ic-icon">🖼️</div><h3>Midjourney</h3><p>Неймовірно красиві арти, які генеруються через Discord</p></div>
+    <div class="info-card"><div class="ic-icon">🗣️</div><h3>ElevenLabs</h3><p>Професійне клонування та реалістична генерація голосу</p></div>
+  </div>
+</div>
+
+<div class="slide" data-section="ЩО МИ ЗАСВОЇЛИ">
+  <h2 class="slide-heading">🎓 Що ми засвоїли?</h2>
+  <div class="neon-line"></div>
+  <div class="cards-grid" style="max-width:1000px;">
+    <div class="info-card">
+      <div class="ic-icon">💡</div>
+      <h3>Промпт-інжиніринг</h3>
+      <p>Навчились правильно «розмовляти» з ШІ — чіткі, деталізовані запити дають набагато кращі результати</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">🖥️</div>
+      <h3>ШІ для звуків,музики і т.д.</h3>
+      <p>Suno.AI,ElevenLabs допоможуть з відео,коли ви не хочете показувати свій голос</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">🎭</div>
+      <h3>Творчість з ШІ</h3>
+      <p>Генерація зображень, відео, музики — ШІ стає інструментом для творчих проєктів</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">⚠️</div>
+      <h3>Критичне мислення</h3>
+      <p>ШІ може помилятись і «галюцинувати» — завжди перевіряй важливу інформацію з інших джерел</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">🔐</div>
+      <h3>Безпека та етика</h3>
+      <p>Авторські права, конфіденційність, deepfakes — важливо розуміти відповідальне використання ШІ</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">🚀</div>
+      <h3>Продуктивність</h3>
+      <p>З ШІ завдання, які займали годину, виконуються за хвилини — навичка майбутнього</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" data-section="ЩО МИ ЗАСВОЇЛИ">
+  <h2 class="slide-heading">💬 Мистецтво Промптів</h2>
+  <div class="neon-line"></div>
+  <div class="prof-content">
+    <p style="font-size:0.9rem;color:rgba(255,255,255,0.65);text-align:center;margin-bottom:20px;">Ключовий скіл у роботі з ШІ — вміти правильно формулювати запити</p>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-num">❌</div>
+        <div class="tl-text">
+          <h3>Поганий промпт</h3>
+          <p style="color:rgba(255,100,100,0.8)">"напиши код"</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">✅</div>
+        <div class="tl-text">
+          <h3>Хороший промпт</h3>
+          <p style="color:rgba(100,255,150,0.8)">"Напиши функцію на Python, яка приймає список чисел і повертає лише ті, що більші за середнє. Додай коментарі та приклад виклику."</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">🏆</div>
+        <div class="tl-text">
+          <h3>Формула успішного промпту</h3>
+          <p>Роль + Завдання + Контекст + Формат + Обмеження = 🔥 Ідеальний результат</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide" data-section="ЩО МИ ЗАСВОЇЛИ">
+  <h2 class="slide-heading">🚧 Труднощі на Шляху</h2>
+  <div class="neon-line"></div>
+  <p style="font-size:0.9rem;color:rgba(255,255,255,0.65);text-align:center;max-width:700px;margin-bottom:20px;">Звісно, не все було ідеально. Робота з ШІ має свої підводні камені.</p>
+  <div class="cards-grid" style="max-width:900px;">
+    <div class="info-card" style="border-color:rgba(255,0,153,0.3);">
+      <div class="ic-icon">⏳</div>
+      <h3>Ліміти безкоштовних версій</h3>
+      <p>Часто повідомлення закінчувались у самий непідходящий момент.</p>
+    </div>
+    <div class="info-card" style="border-color:rgba(255,0,153,0.3);">
+      <div class="ic-icon">🤯</div>
+      <h3>Галюцинації ШІ</h3>
+      <p>Іноді ШІ дуже впевнено видавав неправдиву інформацію.</p>
+    </div>
+    <div class="info-card" style="border-color:rgba(255,0,153,0.3);">
+      <div class="ic-icon">🗣️</div>
+      <h3>Мовний бар'єр</h3>
+      <p>Деякі інструменти (особливо для відео та аудіо) набагато гірше розуміють українську, доводилось перекладати на англійську.</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" data-section="ЩО МИ ЗАСВОЇЛИ">
+  <h2 class="slide-heading">⚖️ Етика ШІ</h2>
+  <div class="neon-line"></div>
+  <div class="cards-grid" style="max-width:900px;">
+    <div class="info-card" style="border-color:rgba(255,100,100,0.3);">
+      <div class="ic-icon">🚫</div>
+      <h3>Дезінформація</h3>
+      <p>ШІ може генерувати неправдивий контент — фейкові новини, deepfakes, фальшиві цитати</p>
+    </div>
+    <div class="info-card" style="border-color:rgba(255,200,0,0.3);">
+      <div class="ic-icon">📝</div>
+      <h3>Авторські права</h3>
+      <p>Зображення, тексти та код від ШІ мають юридично спірний статус у питанні авторства</p>
+    </div>
+    <div class="info-card" style="border-color:rgba(0,255,136,0.3);">
+      <div class="ic-icon">🤝</div>
+      <h3>Відповідальне використання</h3>
+      <p>ШІ — це інструмент. Відповідальність за результат завжди лежить на людині</p>
+    </div>
+    <div class="info-card" style="border-color:rgba(0,240,255,0.3);">
+      <div class="ic-icon">🔒</div>
+      <h3>Приватність</h3>
+      <p>Не вводь особисті дані, паролі та конфіденційну інформацію у публічні чат-боти</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide section-intro" data-section="ПРОФЕСІЯ">
+  <div class="big-num">💻</div>
+  <h2 class="slide-heading" style="background:linear-gradient(135deg,var(--neon-green),var(--neon-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Наша Майбутня Професія</h2>
+  <div class="neon-line" style="background:linear-gradient(90deg,var(--neon-green),var(--neon-blue));"></div>
+  <p style="font-size:1rem;color:rgba(255,255,255,0.6);max-width:550px;line-height:1.7;text-align:center;">
+    Ми хочемо стати програмістами. І ШІ — наш найкращий союзник на цьому шляху.
+  </p>
+</div>
+
+<div class="slide" data-section="ПРОФЕСІЯ">
+  <h2 class="slide-heading">🛠️ ШІ у Програмуванні</h2>
+  <div class="neon-line"></div>
+  <div class="prof-content">
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-num">⚡</div>
+        <div class="tl-text">
+          <h3>Генерація коду</h3>
+          <p>Claude пише цілі функції, компоненти та скрипти за словесним описом. Програміст пояснює «що» — ШІ пише «як».</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">🐛</div>
+        <div class="tl-text">
+          <h3>Дебагінг та пошук помилок</h3>
+          <p>Вставляєш код з помилкою — ШІ знаходить баг, пояснює причину та пропонує виправлення. Економія годин роботи!</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">📚</div>
+        <div class="tl-text">
+          <h3>Навчання нових технологій</h3>
+          <p>ШІ — ідеальний ментор. Пояснює складні концепції простими словами, дає приклади, відповідає на будь-які запитання 24/7.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">🔄</div>
+        <div class="tl-text">
+          <h3>Code Review та оптимізація</h3>
+          <p>ШІ перевіряє код на вразливості, пропонує кращі алгоритми та допомагає дотримуватись best practices.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide" data-section="ПРОФЕСІЯ">
+  <h2 class="slide-heading">🚀 ШІ вже Допомагає Нам</h2>
+  <div class="neon-line"></div>
+  <div class="cards-grid" style="max-width:950px;">
+    <div class="info-card" style="border-color:rgba(0,255,136,0.3);">
+      <div class="ic-icon">🎮</div>
+      <h3>PLATON GAMES</h3>
+      <p>Платон розробляє ігровий сайт,ШІ допомагає йому виправляти помилки у коді.</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">🌐</div>
+      <h3>Веб-розробка</h3>
+      <p>HTML, CSS, JS — ШІ пояснює незрозумілі концепції та допомагає писати кращий чистий код</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">🧩</div>
+      <h3>Алгоритми</h3>
+      <p>Сортування, пошук, структури даних — ШІ ілюструє алгоритми кроково з прикладами коду</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">📱</div>
+      <h3>Майбутні проєкти</h3>
+      <p>Мобільні додатки, ігри, API — з ШІ ми зможемо реалізовувати ідеї набагато швидше</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" data-section="ПРОФЕСІЯ">
+  <h2 class="slide-heading">🔮 Майбутнє: ШІ + Програмісти</h2>
+  <div class="neon-line"></div>
+  <div style="max-width:800px;width:100%;">
+    <div style="background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.2);border-radius:16px;padding:24px;margin-bottom:20px;text-align:center;">
+      <p style="font-family:'Orbitron',sans-serif;font-size:1.1rem;color:var(--neon-green);margin-bottom:12px;">«ШІ не замінить програмістів»</p>
+      <p style="font-size:0.9rem;color:rgba(255,255,255,0.65);line-height:1.7;">ШІ замінить програмістів, які не вміють використовувати ШІ. Ті, хто навчиться працювати з ШІ-інструментами, стануть у 10 разів продуктивнішими.</p>
+    </div>
+    <div class="cards-grid">
+      <div class="info-card">
+        <div class="ic-icon">🤖</div>
+        <h3>AI-Assisted Coding</h3>
+        <p>GitHub Copilot, Cursor, Claude — ШІ вже вбудований у редактори коду</p>
+      </div>
+      <div class="info-card">
+        <div class="ic-icon">💰</div>
+        <h3>Зарплати ростуть</h3>
+        <p>Програмісти з навичками ШІ отримують на 30-50% більше ніж без них</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide" data-section="ПРОФЕСІЯ">
+  <h2 class="slide-heading">🏅 Наші Нові Навички</h2>
+  <div class="neon-line"></div>
+  <div class="cards-grid" style="max-width:1000px;">
+    <div class="info-card">
+      <div class="ic-icon">🎯</div>
+      <h3>Prompt Engineering</h3>
+      <p>Вміємо формулювати точні запити та отримувати якісні результати від будь-якого ШІ</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">🔍</div>
+      <h3>Критична оцінка ШІ</h3>
+      <p>Знаємо коли довіряти ШІ, а коли — перевіряти. Розуміємо обмеження кожної моделі</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">🛠️</div>
+      <h3>Практичний досвід</h3>
+      <p>Реально попрацювали з багатьма ШІ, а не просто читали про них у підручнику</p>
+    </div>
+    <div class="info-card">
+      <div class="ic-icon">🌍</div>
+      <h3>Розуміння індустрії</h3>
+      <p>Знаємо ключових гравців AI-ринку, тенденції та куди рухається технологія</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide section-intro" data-section="ВИСНОВОК">
+  <div class="big-num">✨</div>
+  <h2 class="slide-heading" style="background:linear-gradient(135deg,var(--neon-pink),var(--neon-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Висновок</h2>
+  <div class="neon-line" style="background:linear-gradient(90deg,var(--neon-pink),var(--neon-purple));"></div>
+</div>
+
+<div class="slide" data-section="ВИСНОВОК">
+  <h2 class="slide-heading">📝 Наш Висновок</h2>
+  <div class="neon-line"></div>
+  <div class="conclusion-content">
+    <div class="big-quote">«Штучний інтелект — це не загроза. Це суперсила для тих, хто вміє ним користуватись.»</div>
+    <p>Курс ШІ та нейромережі відкрив нам очі на технологічне майбутнє. Ми переконались, що ШІ — це не щось далеке і складне, а реальний інструмент, який вже зараз допомагає навчатись, творити та розробляти.</p>
+    <p>Як майбутні програмісти, ми розуміємо: ті, хто навчиться ефективно використовувати ШІ сьогодні — отримають величезну перевагу завтра. І ми вже на цьому шляху.</p>
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num">Багато</div><div class="stat-lbl">ШІ вивчено</div></div>
+      <div class="stat-box"><div class="stat-num">100%</div><div class="stat-lbl">Мотивація</div></div>
+      <div class="stat-box"><div class="stat-num">∞</div><div class="stat-lbl">Можливостей</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="slide ad-slide" data-section="РЕКЛАМА">
+  <div class="ad-content">
+    <div class="ad-label">🎮 РЕКЛАМА</div>
+    <h2>PLATON GAMES</h2>
+    <p class="ad-sub">Ігри, пригоди та незабутні персонажі — все це на одному сайті!</p>
+    <a href="https://platon-lab.github.io/PLATON-GAMES/" target="_blank" class="btn-site">
+      🚀 Відвідати PLATON GAMES
+    </a>
+    <div class="heroes-row">
+      <img src="Tito.png"    alt="Tito"    class="hero-img" onerror="this.style.background='rgba(0,255,136,0.1)';this.alt='Tito 🐱'">
+      <img src="Smartik.png" alt="Smartik" class="hero-img" onerror="this.style.background='rgba(0,240,255,0.1)';this.alt='Smartik 🤓'">
+      <img src="Junior.png"  alt="Junior"  class="hero-img" onerror="this.style.background='rgba(180,0,255,0.1)';this.alt='Junior 😎'">
+      <img src="Fil.png"     alt="Fil"     class="hero-img" onerror="this.style.background='rgba(255,0,153,0.1)';this.alt='Fil 🐘'">
+      <img src="Milka.png"   alt="Milka"   class="hero-img" onerror="this.style.background='rgba(255,204,0,0.1)';this.alt='Milka 🐄'">
+      <img src="Bark.png"    alt="Bark"    class="hero-img" onerror="this.style.background='rgba(255,136,0,0.1)';this.alt='Bark 🐶'">
+    </div>
+  </div>
+</div>
+
+<div class="slide" data-section="ФІНАЛ">
+  <div style="text-align:center; width: 100%;">
+    <div class="thanks-h">Дякуємо за увагу!</div>
+    
+    <div class="credits-wrapper">
+      <div class="credits-scroll">
+        <div class="cr-role">Автори проєкту</div>
+        <div class="cr-name">Абрамовіч Платон</div>
+        <div class="cr-name">Бєліков Рома</div>
+
+        <div class="cr-role">Курс</div>
+        <div class="cr-name">ШІ та Нейромережі</div>
+
+        <div class="cr-role">Головні ШІ-Актори</div>
+        <div class="cr-name">ChatGPT</div>
+        <div class="cr-name">DeepSeek</div>
+        <div class="cr-name">Gemini</div>
+        <div class="cr-name">Grok</div>
+        <div class="cr-name">Leonardo.ai</div>
+        <div class="cr-name">Vizard.ai</div>
+        <div class="cr-name">DALL·E</div>
+
+        <div class="cr-role">Ідеї</div>
+        <div class="cr-name">Рома Бєліков</div>
+
+        <div class="cr-role">Програмування</div>
+        <div class="cr-name">Абрамовіч Платон</div>
+
+        <div class="cr-role">Виробництво</div>
+        <div class="cr-name">PLATON LAB</div>
+        <div class="cr-name" style="font-size: 1rem; color: rgba(255,255,255,0.5);">© 2026</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="video-overlay">
+  <div id="video-title"></div>
+  <video id="main-video" preload="auto" playsinline>
+    Ваш браузер не підтримує відео.
+  </video>
+  <div id="skip-hint">Натисни 5 разів щоб пропустити</div>
+  <div id="skip-progress">
+    <div class="skip-dot" id="dot-1"></div>
+    <div class="skip-dot" id="dot-2"></div>
+    <div class="skip-dot" id="dot-3"></div>
+    <div class="skip-dot" id="dot-4"></div>
+    <div class="skip-dot" id="dot-5"></div>
+  </div>
+</div>
+
+<div id="nav">
+  <button id="btn-prev" onclick="changeSlide(-1)" disabled>← Назад</button>
+  <div id="slide-counter">1 / 29</div>
+  <button id="btn-next" onclick="changeSlide(1)">Далі →</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  let videoSkipCount = 0;
+
+  function updateUI() {
+    const s = slides[current];
+    document.getElementById('slide-counter').textContent = `${current + 1} / ${total}`;
+    document.getElementById('btn-prev').disabled = current === 0;
+    document.getElementById('btn-next').disabled = current === total - 1;
+    document.getElementById('progress').style.width = ((current / (total - 1)) * 100) + '%';
+    const lbl = s.dataset.section || '';
+    document.getElementById('section-label').textContent = lbl;
+  }
+
+  function changeSlide(dir) {
+    const next = current + dir;
+    if (next < 0 || next >= total) return;
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exit');
+    setTimeout(() => { slides[current].classList.remove('exit'); }, 600);
+    current = next;
+    slides[current].classList.add('active');
+    updateUI();
+  }
+
+  // Keyboard
+  document.addEventListener('keydown', e => {
+    if (document.getElementById('video-overlay').classList.contains('show')) return;
+    if (e.key === 'ArrowRight' || e.key === ' ') changeSlide(1);
+    if (e.key === 'ArrowLeft') changeSlide(-1);
+  });
+
+  // VIDEO PLAYBACK FIX
+  function playVideo(file, title) {
+    const overlay = document.getElementById('video-overlay');
+    const video = document.getElementById('main-video');
+    
+    document.getElementById('video-title').textContent = title;
+    
+    // Встановлюємо src напряму у відео тег
+    video.src = file;
+    video.load(); // Примусово перезавантажуємо відео
+    
+    overlay.classList.add('show');
+    
+    // Невеличка затримка гарантує, що браузер встиг підхопити файл
+    setTimeout(() => {
+      let playPromise = video.play();
+      if (playPromise !== undefined) {
+          playPromise.catch(error => { console.log("Відтворення заблоковано браузером:", error); });
+      }
+    }, 100);
+
+    videoSkipCount = 0;
+    updateSkipDots();
+
+    // Auto-advance when video ends
+    video.onended = closeVideoAndNext;
+  }
+
+  function closeVideoAndNext() {
+    const overlay = document.getElementById('video-overlay');
+    const video = document.getElementById('main-video');
+    
+    video.pause();
+    video.removeAttribute('src'); // Повністю видаляємо джерело
+    video.load(); // Скидаємо стан плеєра
+    
+    overlay.classList.remove('show');
+    videoSkipCount = 0;
+    updateSkipDots();
+    
+    changeSlide(1);
+  }
+
+  function updateSkipDots() {
+    for (let i = 1; i <= 5; i++) {
+      const d = document.getElementById('dot-' + i);
+      if (i <= videoSkipCount) d.classList.add('filled');
+      else d.classList.remove('filled');
+    }
+  }
+
+  // Click on overlay to skip (5 times)
+  document.getElementById('video-overlay').addEventListener('click', function(e) {
+    if (e.target.id === 'video-close') return;
+    videoSkipCount++;
+    updateSkipDots();
+    if (videoSkipCount >= 5) {
+      closeVideoAndNext();
+    }
+  });
+
+  updateUI();
+</script>
+</body>
+</html>
