@@ -417,7 +417,7 @@
     }
     .hero-img:hover { transform: scale(1.25) rotate(8deg); border-color: #00ff88; box-shadow: 0 0 20px rgba(0,255,136,0.6); z-index: 10; position: relative;}
 
-    /* CREDITS ANIMATION */
+    /* CREDITS ANIMATION - ВІДРЕДАГОВАНО ДЛЯ ПРАВИЛЬНОГО СТАРТУ */
     .credits-wrapper {
       position: relative; width: 100%; max-width: 800px; height: 55vh; margin: 20px auto 0;
       overflow: hidden;
@@ -426,12 +426,10 @@
     }
     .credits-scroll {
       position: absolute; top: 100%; left: 0; width: 100%;
-      animation: credits-run 25s linear infinite;
       text-align: center;
       padding-bottom: 50px;
-    }
-    .credits-scroll:hover {
-      animation-play-state: paused;
+      animation: credits-run 25s linear forwards;
+      animation-play-state: paused; /* Спочатку на паузі */
     }
     @keyframes credits-run {
       0% { top: 100%; }
@@ -535,10 +533,68 @@
       z-index: 100;
     }
 
+    /* ── NEW GALLERY ── */
+    .gallery-grid {
+      display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;
+      max-width: 1000px; margin-top: 20px;
+    }
+    .gallery-img {
+      width: 180px; height: 130px; object-fit: cover;
+      border-radius: 12px; border: 2px solid var(--border);
+      cursor: pointer; transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .gallery-img:hover { transform: scale(1.1); border-color: var(--neon-purple); box-shadow: 0 0 20px var(--neon-purple); z-index: 10; position: relative;}
+    
+    /* ── MODAL ── */
+    #img-modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000;
+      display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px);
+    }
+    #img-modal.show { display: flex; }
+    #modal-img { max-width: 90%; max-height: 90%; border-radius: 15px; box-shadow: 0 0 50px var(--neon-blue); }
+    .close-modal {
+      position: absolute; top: 30px; right: 40px; color: #fff; font-size: 50px; cursor: pointer; 
+      font-family: sans-serif; transition: color 0.3s, transform 0.3s;
+    }
+    .close-modal:hover { color: var(--neon-pink); transform: scale(1.2); }
+
+    /* ── QUIZ & FINAL FULLSCREEN SLIDES ── */
+    #end-video-container, #final-video-container {
+      position: fixed; inset: 0; z-index: 2500; display: none; background: #000;
+    }
+    #end-video-container.show, #final-video-container.show { display: block; }
+    .fullscreen-vid { width: 100%; height: 100%; object-fit: cover; }
+    
+    #quiz-container {
+      position: fixed; inset: 0; z-index: 2600; display: none; background: rgba(4, 4, 15, 0.95);
+      align-items: center; justify-content: center; flex-direction: column; gap: 40px;
+      backdrop-filter: blur(20px);
+    }
+    #quiz-container.show { display: flex; }
+    .quiz-title { 
+      font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 5vw, 4rem); 
+      color: var(--neon-blue); text-shadow: 0 0 20px var(--neon-blue); text-align: center;
+    }
+    .quiz-buttons { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; max-width: 900px; }
+    .quiz-btn {
+      background: rgba(0,0,0,0.6); border: 2px solid var(--neon-blue);
+      color: var(--neon-blue); padding: 25px 50px; font-size: 2rem; font-family: 'Orbitron', sans-serif;
+      border-radius: 20px; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 15px rgba(0,240,255,0.2);
+    }
+    .quiz-btn:hover { background: var(--neon-blue); color: #000; transform: scale(1.05); box-shadow: 0 0 40px var(--neon-blue); }
+    
+    #final-text {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-family: 'Orbitron', sans-serif; font-size: clamp(5rem, 15vw, 10rem); font-weight: 900;
+      color: #ff0000; text-shadow: 0 0 40px #ff0000, 0 0 80px #ff0000; 
+      z-index: 2501; pointer-events: none; text-transform: uppercase; letter-spacing: 10px;
+    }
+
     @media (max-width: 600px) {
       .ai-logo-box { width: 100px; height: 100px; font-size: 3rem; }
       #nav button { padding: 6px 14px; font-size: 10px; }
       .slide { padding: 20px; }
+      .quiz-btn { font-size: 1.2rem; padding: 15px 25px; }
     }
   </style>
 </head>
@@ -548,6 +604,9 @@
 <div id="progress"></div>
 <div class="section-label" id="section-label">ВСТУП</div>
 <div id="key-hint">← → або ПРОБІЛ</div>
+
+<audio id="audio-mayo" src="Майонез.mp3"></audio>
+<audio id="audio-tochno" src="Точно.mp3"></audio>
 
 <script>
   for(let i=0;i<15;i++){
@@ -918,7 +977,7 @@
       <h2>DALL·E</h2>
       <div class="ai-tagline">OpenAI · Вбудований у ChatGPT</div>
       <div class="ai-desc">
-        DALL·E — це функція генерування зображень, вбудована прямо в ChatGPT! Ти просто пишеш у чаті що хочеш намалювати, і за секунди отримуєш картинку. Більше не потрібно окремо відкривати інші сайти — все в одному місці.
+        DALL·E — це функція генерування зображень, вбудована прямо в ChatGPT! Типис просто пишеш у чаті що хочеш намалювати, і за секунди отримуєш картинку. Більше не потрібно окремо відкривати інші сайти — все в одному місці.
       </div>
       <div class="fact-box">
         <div class="fact-label">🌟 ЦІКАВИЙ ФАКТ</div>
@@ -999,7 +1058,7 @@
 <div class="slide" data-section="ШІ-ІНСТРУМЕНТИ">
   <h2 class="slide-heading">🌌 Це ще не все...</h2>
   <div class="neon-line"></div>
-  <p style="font-size:1rem;color:rgba(255,255,255,0.7);text-align:center;max-width:800px;margin-bottom:20px;">За час курсу ми тестували набагато більше інструментів. Ось деякі з них, які теж варті уваги:</p>
+  <p style="font-size:1rem;color:rgba(255,255,255,0.7);text-align:center;max-width:800px;margin-bottom:20px;">ШІ що ми ще не вчили,але я рекомендую:</p>
   <div class="cards-grid">
     <div class="info-card"><div class="ic-icon">🎵</div><h3>Suno AI</h3><p>Генерація крутих пісень та музики за текстовим описом</p></div>
     <div class="info-card"><div class="ic-icon">🧠</div><h3>Claude</h3><p>Дуже розумний ШІ від Anthropic, відмінно пише тексти</p></div>
@@ -1294,7 +1353,7 @@
     <div class="thanks-h">Дякуємо за увагу!</div>
     
     <div class="credits-wrapper">
-      <div class="credits-scroll">
+      <div class="credits-scroll" id="credits-anim">
         <div class="cr-role">Автори проєкту</div>
         <div class="cr-name">Абрамовіч Платон</div>
         <div class="cr-name">Бєліков Рома</div>
@@ -1312,7 +1371,7 @@
         <div class="cr-name">DALL·E</div>
 
         <div class="cr-role">Ідеї</div>
-        <div class="cr-name">Рома Бєліков</div>
+        <div class="cr-name">Абрамовіч Платон,Рома Бєліков,Саша Тараненко</div>
 
         <div class="cr-role">Програмування</div>
         <div class="cr-name">Абрамовіч Платон</div>
@@ -1324,6 +1383,48 @@
     </div>
 
   </div>
+</div>
+
+<div class="slide" data-section="ГАЛЕРЕЯ ШІ">
+  <h2 class="slide-heading">🖼️ ШІ-Виставка Роми</h2>
+  <div class="neon-line"></div>
+  <div class="gallery-grid">
+    <img src="1.png" class="gallery-img" onclick="openModal(this.src)" alt="ШІ Арт 1">
+    <img src="2.png" class="gallery-img" onclick="openModal(this.src)" alt="ШІ Арт 2">
+    <img src="3.png" class="gallery-img" onclick="openModal(this.src)" alt="ШІ Арт 3">
+    <img src="4.png" class="gallery-img" onclick="openModal(this.src)" alt="ШІ Арт 4">
+    <img src="5.png" class="gallery-img" onclick="openModal(this.src)" alt="ШІ Арт 5">
+    <img src="6.png" class="gallery-img" onclick="openModal(this.src)" alt="ШІ Арт 6">
+    <img src="7.png" class="gallery-img" onclick="openModal(this.src)" alt="ШІ Арт 7">
+  </div>
+  <p style="text-align:center; margin-top:30px; color:rgba(255,255,255,0.5); font-family: 'Orbitron', sans-serif;">Натисни на фото, щоб збільшити</p>
+</div>
+
+<div class="slide" data-section="ОЦІНКА">
+</div>
+
+<div id="img-modal">
+  <span class="close-modal" onclick="closeModal()">×</span>
+  <img id="modal-img" src="">
+</div>
+
+<div id="end-video-container">
+  <video id="vid-end" class="fullscreen-vid" playsinline></video>
+</div>
+
+<div id="quiz-container">
+  <div class="quiz-title">Яку оцінку ми отримаємо?</div>
+  <div class="quiz-buttons">
+     <button class="quiz-btn" onclick="checkAnswer(12)">12</button>
+     <button class="quiz-btn" onclick="checkAnswer(2)">2</button>
+     <button class="quiz-btn" onclick="checkAnswer(1)">1</button>
+     <button class="quiz-btn" onclick="checkAnswer(0)">Відводете до директора</button>
+  </div>
+</div>
+
+<div id="final-video-container">
+  <div id="final-text">КІНЕЦЬ</div>
+  <video id="vid-final" class="fullscreen-vid" loop playsinline></video>
 </div>
 
 <div id="video-overlay">
@@ -1352,6 +1453,7 @@
   const total = slides.length;
   let current = 0;
   let videoSkipCount = 0;
+  let creditsTimeout;
 
   function updateUI() {
     const s = slides[current];
@@ -1366,17 +1468,104 @@
   function changeSlide(dir) {
     const next = current + dir;
     if (next < 0 || next >= total) return;
+    
+    // Зупиняємо музику та таймер титрів, якщо йдемо з фіналу
+    const mayo = document.getElementById('audio-mayo');
+    if (slides[current].dataset.section === "ФІНАЛ" && dir !== 0) {
+        mayo.pause();
+        mayo.currentTime = 0;
+        clearTimeout(creditsTimeout);
+    }
+
     slides[current].classList.remove('active');
     slides[current].classList.add('exit');
     setTimeout(() => { slides[current].classList.remove('exit'); }, 600);
     current = next;
     slides[current].classList.add('active');
     updateUI();
+
+    const newSection = slides[current].dataset.section;
+
+    // ЛОГІКА ДЛЯ ТИТРІВ
+    if (newSection === "ФІНАЛ") {
+       const credits = document.getElementById('credits-anim');
+       // Завжди запускаємо анімацію з самого початку
+       credits.style.animation = 'none';
+       credits.offsetHeight; /* тригер reflow */
+       credits.style.animation = 'credits-run 25s linear forwards';
+       credits.style.animationPlayState = 'running';
+
+       mayo.play().catch(e => console.log("Браузер заблокував автозапуск аудіо", e));
+
+       // Автоматичний перехід на галерею після титрів
+       creditsTimeout = setTimeout(() => {
+           if(slides[current].dataset.section === "ФІНАЛ") {
+               changeSlide(1);
+           }
+       }, 25000); // 25 секунд
+    }
+
+    // ЛОГІКА ДЛЯ ВІДЕО ОЦІНКИ
+    if (newSection === "ОЦІНКА") {
+       document.getElementById('nav').style.display = 'none'; // Ховаємо навігацію
+       document.getElementById('end-video-container').classList.add('show');
+       const endVid = document.getElementById('vid-end');
+       endVid.src = "End.mp4";
+       endVid.play().catch(e => console.log("Браузер заблокував відео", e));
+       
+       endVid.onended = () => {
+           document.getElementById('end-video-container').classList.remove('show');
+           document.getElementById('quiz-container').classList.add('show');
+       };
+    }
+  }
+
+  // ФУНКЦІЇ ДЛЯ ГАЛЕРЕЇ
+  function openModal(src) {
+     document.getElementById('modal-img').src = src;
+     document.getElementById('img-modal').classList.add('show');
+  }
+  
+  function closeModal() {
+     document.getElementById('img-modal').classList.remove('show');
+     document.getElementById('modal-img').src = "";
+  }
+
+  // ФУНКЦІЇ ДЛЯ ТЕСТУ (ПАСТКА)
+  function checkAnswer(val) {
+     if (val === 12) {
+         playFinal();
+     } else {
+         // Змінюємо всі кнопки на 12
+         const btns = document.querySelectorAll('.quiz-btn');
+         btns.forEach(b => {
+             b.textContent = "12";
+             b.onclick = () => playFinal();
+         });
+         // Граємо звук
+         const tochno = document.getElementById('audio-tochno');
+         tochno.play().catch(e => console.log(e));
+     }
+  }
+
+  function playFinal() {
+     document.getElementById('quiz-container').classList.remove('show');
+     document.getElementById('final-video-container').classList.add('show');
+     const finalVid = document.getElementById('vid-final');
+     finalVid.src = "Final.mp4";
+     finalVid.play().catch(e => console.log(e));
   }
 
   // Keyboard
   document.addEventListener('keydown', e => {
     if (document.getElementById('video-overlay').classList.contains('show')) return;
+    if (document.getElementById('img-modal').classList.contains('show')) {
+        if(e.key === 'Escape') closeModal();
+        return;
+    }
+    // Блокуємо клавіатуру на екрані оцінки
+    if (slides[current].dataset.section === "ОЦІНКА") return;
+
     if (e.key === 'ArrowRight' || e.key === ' ') changeSlide(1);
     if (e.key === 'ArrowLeft') changeSlide(-1);
   });
@@ -1388,13 +1577,11 @@
     
     document.getElementById('video-title').textContent = title;
     
-    // Встановлюємо src напряму у відео тег
     video.src = file;
-    video.load(); // Примусово перезавантажуємо відео
+    video.load(); 
     
     overlay.classList.add('show');
     
-    // Невеличка затримка гарантує, що браузер встиг підхопити файл
     setTimeout(() => {
       let playPromise = video.play();
       if (playPromise !== undefined) {
@@ -1405,7 +1592,6 @@
     videoSkipCount = 0;
     updateSkipDots();
 
-    // Auto-advance when video ends
     video.onended = closeVideoAndNext;
   }
 
@@ -1414,8 +1600,8 @@
     const video = document.getElementById('main-video');
     
     video.pause();
-    video.removeAttribute('src'); // Повністю видаляємо джерело
-    video.load(); // Скидаємо стан плеєра
+    video.removeAttribute('src'); 
+    video.load(); 
     
     overlay.classList.remove('show');
     videoSkipCount = 0;
@@ -1432,7 +1618,6 @@
     }
   }
 
-  // Click on overlay to skip (5 times)
   document.getElementById('video-overlay').addEventListener('click', function(e) {
     if (e.target.id === 'video-close') return;
     videoSkipCount++;
